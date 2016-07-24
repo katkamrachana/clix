@@ -1,3 +1,7 @@
+'''
+Please find updated script here: https://github.com/katkamrachana/clix
+'''
+
 import xlrd
 import  mimetypes
 import os
@@ -9,8 +13,17 @@ doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYP
 
 
 def init_html():
-	html_tag = '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">'
-	return html_tag
+	'''
+	<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+	'''
+
+	html_ele = HTML()
+	html_ele_dct = {
+	       "xmlns" : "http://www.w3.org/1999/xhtml",
+	       "xmlns:epub" : "http://www.idpf.org/2007/ops"
+	}
+	html_ele.html(**html_ele_dct)	
+	return html_ele
 
 def head_block():
 	'''
@@ -20,34 +33,32 @@ def head_block():
 		<link href="../Styles/style.css" rel="stylesheet" type="text/css" />
 	</head>
 	'''
-	head_block = '<head><meta content="IE=edge" http-equiv="X-UA-Compatible" /><title>CLIx</title><link href="../Styles/style.css" rel="stylesheet" type="text/css" /></head>'
-	return head_block
+	hd = HTML('head')
+	head_ele_dct = {
+	       'http-equiv': 'X-UA-Compatible',
+	       'content': 'IE=edge'
+	}
+	hd.meta(**head_ele_dct)	
+	hd.title('CLIx')
+	hd.link(href="../Styles/style.css", rel="stylesheet", type="text/css")
+	# print hd
+	# head_block = '<head><meta content="IE=edge" http-equiv="X-UA-Compatible" /><title>CLIx</title><link href="../Styles/style.css" rel="stylesheet" type="text/css" /></head>'
+	# return head_block
+	return hd
 
 def fill_dict(sheet_obj, row_index):
 	each_sheet_on_screen_data_keys = ['Image', 'Video', 'Text', 'Word cloud', 'Audio Track', 'Subtitles (Audio)', 'Subtitles (Video)']
-	# for each_frow in xrange(row_index, sheet_obj.nrows):
-	# fval_list = sheet_obj.row_values(each_frow, 1,2)
 	key_list = sheet_obj.col_values(1, row_index, row_index + 7)
 	fval_list = sheet_obj.col_values(2, row_index, row_index + 7)
 	each_sheet_on_screen_data = {}
-	# print "fval_list = ", key_list, " -- ", fval_list
-	# each_sheet_on_screen_data.update()
 	try:
 		each_sheet_on_screen_data = dict((k, str(v)) for k, v in zip(key_list, fval_list) if v and k in each_sheet_on_screen_data_keys)
 	except UnicodeEncodeError as e:
 		pass
-		# print sheet_obj.name
-		# print e
-		# print fval_list
-	# each_sheet_on_screen_data = dict(zip(key_list,fval_list))
-	# print "\n final dict = ", each_sheet_on_screen_data
-	# print "*"*80
-	# print "*"*80
 	return each_sheet_on_screen_data
 
 
-def createHTMLHeader1Element(activity_num, activity_name, body_DOM):
-	# print activity_num
+def createHTMLHeaderElement(activity_num, activity_name, body_DOM):
 	'''
 	<header class="group span_10_of_12">
 	<small>this is small header text, for the activity number or lesson title</small>
@@ -58,7 +69,6 @@ def createHTMLHeader1Element(activity_num, activity_name, body_DOM):
 	<hr/>
 	</header>
 	'''
-	# h = HTML()
 
 	header1 = body_DOM.header(klass="group span_10_of_12")
 	header1.small("CONVERSATIONAL ENGLISH")
@@ -66,15 +76,6 @@ def createHTMLHeader1Element(activity_num, activity_name, body_DOM):
 	header1.hr
 	return body_DOM
 
-# def createHTMLHeader2Element(heading, body_DOM):
-# 	# print heading
-
-# 	# header2 = HTML('h2',heading)
-# 	body_DOM.h2(heading)
-# 	# header2 = HTML('h2',heading)
-# 	# body_html.h2(heading)
-# 	# return header2
-# 	return body_DOM
 
 def getImgRowHTML(fn, DOM_obj):
 
@@ -248,7 +249,7 @@ for each_sheet in workbook.sheets():
 				dict_obj = fill_dict(each_sheet, each_row)
 				if dict_obj:
 					if activity_num and activity_name:
-						header_ele = createHTMLHeader1Element(activity_num, activity_name, body_html)
+						header_ele = createHTMLHeaderElement(activity_num, activity_name, body_html)
 					main_tag_in_body = body_html.main(klass="group span_10_of_12")
 					html_content = parseOnScreenEle(dict_obj, main_tag_in_body)
 					# print "\n Processing: ", each_sheet.name,
