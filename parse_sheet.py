@@ -7,7 +7,7 @@ import  mimetypes
 import os
 from html import HTML
 
-workbook = xlrd.open_workbook('/home/rbkatkam/Downloads/U1L2Activities Template.xlsx')
+workbook = xlrd.open_workbook('/home/rbkatkam/clix_project/U1 L2 Activities Template.xlsx')
 print "\n Total sheets: ", workbook.nsheets
 doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
 
@@ -55,6 +55,9 @@ def fill_dict(sheet_obj, row_index):
 		each_sheet_on_screen_data = dict((k, str(v)) for k, v in zip(key_list, fval_list) if v and k in each_sheet_on_screen_data_keys)
 	except UnicodeEncodeError as e:
 		pass
+	except Exception as fill_dict_err:
+		pass
+		# print "\n Error occurred in fill_dict!!! ", fill_dict_err
 	return each_sheet_on_screen_data
 
 
@@ -213,63 +216,65 @@ def parseOnScreenEle(dictionary_obj, body_DOM):
 			pass
 		if ele_type == "Subtitles (Video)":
 			pass
-	# print "\n ", body_html
+	# print "\n body_DOM == ", body_DOM
 	return body_DOM
-
-for each_sheet in workbook.sheets():
-	if "Activity" in each_sheet.name:
-		html_content = header_ele = None
-		body_html = HTML('body')
-		
-		for each_row in xrange(each_sheet.nrows):
-			val_list = each_sheet.row_values(each_row)
-			if "Activity Number" in val_list:
-				# Default Activity Name columns is 0(Zero)
+try:
+	for each_sheet in workbook.sheets():
+		# print " || No. of rows found: ", each_sheet.nrows
+		if "Activity" in each_sheet.name:
+			print "\n Processing: ", each_sheet.name,
+			html_content = header_ele = None
+			body_html = HTML('body')
+			for each_row in xrange(each_sheet.nrows):
+				val_list = each_sheet.row_values(each_row)
+				val_list = map(unicode,val_list)
 				# print "\n val list = ", val_list
-				try:
-					activity_num = val_list[1]
-				except IndexError as name_not_found:
-					print "\n Error !! ", name_not_found
-					pass
+				if "Activity Number" in val_list:
+					try:
+						activity_num = val_list[1]
+					except IndexError as name_not_found:
+						print "\n Error !! ", name_not_found
+						pass
 
-				# print "Activity Name== ", val_list[2]
+				if "Activity Name" in val_list:
+					try:
+						activity_name = val_list[2]
+					except IndexError as name_not_found:
+						print "\n Error !! ", name_not_found
+						pass
 
-			if "Activity Name" in val_list:
-				# Default Activity Name columns is 0(Zero)
-				# print "\n val list = ", val_list
-				try:
-					activity_name = val_list[2]
-				except IndexError as name_not_found:
-					print "\n Error !! ", name_not_found
-					pass
+				unplatform_row_exists = any('UnPlatform' in each_row for each_row in val_list)
+				# print "\n unplatform_row_exists", unplatform_row_exists
 
-				# print "Activity Name== ", val_list[2]
-
-			if "On Screen / UnPlatform" in val_list:
-				dict_obj = fill_dict(each_sheet, each_row)
-				if dict_obj:
-					if activity_num and activity_name:
-						header_ele = createHTMLHeaderElement(activity_num, activity_name, body_html)
-					main_tag_in_body = body_html.main(klass="group span_10_of_12")
-					html_content = parseOnScreenEle(dict_obj, main_tag_in_body)
-					# print "\n Processing: ", each_sheet.name,
-					# print " || No. of rows found: ", each_sheet.nrows	
+				# if "On Screen / UnPlatform " in val_list:
+				if unplatform_row_exists:
+					dict_obj = fill_dict(each_sheet, each_row)
+					if each_sheet.name == "Activity 0204 - CLIx Time":
+						print "\n val_list is ",val_list
 					# print "\n final dict = ", dict_obj
-					continue
-		# print "\n html_content: "
-		# if (html_content):
-		# 	print "Yes"
-		# else:
-		# 	print "No"
-		# print "\n h1_ele: ", h1_ele
-		# print "\n h2_ele: ", h2_ele
-		if html_content and header_ele:
-			# print "\n body_html = ", body_html
-			# global doc_defination
-			w = open(str(each_sheet.name)+'.html', 'w+')
-			w.write(doc_defination + str(init_html())+str(head_block())+str(body_html)+"</html>")
-			# w.write(doc_defination + str(init_html(1))+str(head_block())+str(h1_ele)+ str(h2_ele)+ str(html_content)+"</html>")
-			w.close()
-			# print "\n sheet_obj : ", each_sheet.name
-			# print "\n Created file: ", each_sheet.name
+					if dict_obj:
+						if activity_num and activity_name:
+							header_ele = createHTMLHeaderElement(activity_num, activity_name, body_html)
+						main_tag_in_body = body_html.main(klass="group span_10_of_12")
+						html_content = parseOnScreenEle(dict_obj, main_tag_in_body)
+						continue
+			# print "\n html_content: "
+			# if (html_content):
+			# 	print "Yes"
+			# else:
+			# 	print "No"
+			# print "\n h1_ele: ", html_content
+			# print "\n h2_ele: ", header_ele
+			if html_content and header_ele:
+				w = open(str(each_sheet.name)+'.html', 'w+')
+				w.write(doc_defination + str(init_html())+str(head_block())+str(body_html)+"</html>")
+				w.close()
+				# print "\n sheet_obj : ", each_sheet.name
+				print "\n Created file: ", each_sheet.name
+				print "*"*80
+		else:
+			print "\n Skipping: ", each_sheet.name
 			print "*"*80
+
+except Exception as e:
+	print "\n Error occurred!!!  ", e
