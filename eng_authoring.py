@@ -6,8 +6,9 @@ import xlrd
 import  mimetypes
 import os
 from html import HTML
+import eng_master_doc
 
-workbook = xlrd.open_workbook('../U1 L2 Activities Template.xlsx')
+workbook = xlrd.open_workbook('../U1 L1 Activities Template.xlsx')
 print "\n Total sheets: ", workbook.nsheets
 doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
 
@@ -52,12 +53,12 @@ def fill_dict(sheet_obj, row_index):
 	fval_list = sheet_obj.col_values(2, row_index, row_index + 7)
 	each_sheet_on_screen_data = {}
 	try:
-		each_sheet_on_screen_data = dict((k, str(v)) for k, v in zip(key_list, fval_list) if v and k in each_sheet_on_screen_data_keys)
+		each_sheet_on_screen_data = dict((k, str(v)) for k, v in zip(key_list, fval_list) if v and unicode(k) in each_sheet_on_screen_data_keys)
 	except UnicodeEncodeError as e:
 		pass
 	except Exception as fill_dict_err:
+		print "\n Error occurred in fill_dict!!! ", fill_dict_err
 		pass
-		# print "\n Error occurred in fill_dict!!! ", fill_dict_err
 	return each_sheet_on_screen_data
 
 
@@ -79,6 +80,18 @@ def createHTMLHeaderElement(activity_num, activity_name, body_DOM):
 	header1.hr
 	return body_DOM
 
+def getVideoRowHTML(vfn, DOM_obj):
+    for each_video_file in vfn:
+        article_ele = DOM_obj.article(klass='group')
+        vid_ele = {
+            "id":each_video_file,"src":"../Video/"+each_video_file, "alt":"", \
+            "klass":"video-js vis-skin-colors-clix vjs-big-play-centered", \
+            "controls":"controls", "preload":"auto", "width":"480", "height":"360", \
+            "data-setup":'{}'
+        }
+        vid_ele = article_ele.video(**vid_ele)
+        vid_ele.source(src="../Video/"+ each_video_file, type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
+        vid_ele.track(kind="captions", src="../Video/"+each_video_file+"_en.vtt", srclang="en", label="English", type="text/vtt")
 
 def getImgRowHTML(fn, DOM_obj):
 
@@ -199,10 +212,42 @@ def parseOnScreenEle(dictionary_obj, body_DOM):
 
 
 				# print "\n\n img_files", img_files
+
 		if ele_type == "Video":
-			pass
+			'''
+				<video id="[filename without .mp4 here]" class="video-js vis-skin-colors-clix\
+				vjs-big-play-centered" controls="controls" preload="auto" width="480" height="360" data-setup='{}'>
+				<source src="../Video/[filename here]" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/>
+				<track kind="captions" src="../Video/[filename without .mp4 here]_en.vtt" \
+				srclang="en" label="English" type="text/vtt"/>
+				<track kind="captions" src="../Video/[filename without .mp4 here]_hi.vtt" \
+				srclang="hi" label="Hindi" type="text/vtt"/>
+				<track kind="captions" src="../Video/[filename without .mp4 here]_te.vtt" \
+				srclang="te" label="Telegu" type="text/vtt"/>
+				<p class="vjs-no-js">To view this video please enable JavaScript, and \
+				consider upgrading to a web browser that <a \ 
+				href="http://videojs.com/html5-video-support/" \
+				target="_blank">supports HTML5 video</a></p>
+				</video>
+			'''
+			sheet_videos_path = 'videos/' + each_sheet.name
+			if os.path.exists(sheet_videos_path):
+				video_filelist = os.listdir(sheet_videos_path)
+				vid_files = []
+				for each_video in video_filelist:
+					try:
+						valid_video = mimetypes.guess_type(sheet_videos_path + '/' +each_video)
+					except Exception as valid_video_err:
+						valid_video = None
+					if valid_video and 'video' in valid_video[0]:
+						vid_files.append(each_video)
+				# print "\n final list: ", vid_files
+				if vid_files:
+					getVideoRowHTML(vid_files, body_DOM)
+		'''
 		if ele_type == "Word cloud":
 			pass
+		'''
 		if ele_type == "Audio Track":
 			'''
 			<audio width="360" height="360" controls="" class="span_12_of_12">
@@ -249,8 +294,6 @@ try:
 				# if "On Screen / UnPlatform " in val_list:
 				if unplatform_row_exists:
 					dict_obj = fill_dict(each_sheet, each_row)
-					if each_sheet.name == "Activity 0204 - CLIx Time":
-						print "\n val_list is ",val_list
 					# print "\n final dict = ", dict_obj
 					if dict_obj:
 						if activity_num and activity_name:
@@ -265,7 +308,7 @@ try:
 			# 	print "No"
 			# print "\n h1_ele: ", html_content
 			# print "\n h2_ele: ", header_ele
-			if html_content and header_ele:
+			if body_html:
 				w = open(str(each_sheet.name)+'.html', 'w+')
 				w.write(doc_defination + str(init_html())+str(head_block())+str(body_html)+"</html>")
 				w.close()
