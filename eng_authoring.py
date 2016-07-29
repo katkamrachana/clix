@@ -82,6 +82,7 @@ def createHTMLHeaderElement(activity_num, activity_name, body_DOM):
 
 def getVideoRowHTML(vfn, DOM_obj):
     for each_video_file in vfn:
+
         article_ele = DOM_obj.article(klass='group')
         vid_ele = {
             "id":each_video_file,"src":"../Video/"+each_video_file, "alt":"", \
@@ -239,9 +240,9 @@ def parseOnScreenEle(dictionary_obj, body_DOM):
 						valid_video = mimetypes.guess_type(sheet_videos_path + '/' +each_video)
 					except Exception as valid_video_err:
 						valid_video = None
-					if valid_video and 'video' in valid_video[0]:
+						# print valid_video_err
+					if valid_video and valid_video[0] and 'video' in valid_video[0]:
 						vid_files.append(each_video)
-				# print "\n final list: ", vid_files
 				if vid_files:
 					getVideoRowHTML(vid_files, body_DOM)
 		'''
@@ -287,7 +288,6 @@ try:
 					except IndexError as name_not_found:
 						print "\n Error !! ", name_not_found
 						pass
-
 				unplatform_row_exists = any('UnPlatform' in each_row for each_row in val_list)
 				# print "\n unplatform_row_exists", unplatform_row_exists
 
@@ -301,6 +301,7 @@ try:
 						main_tag_in_body = body_html.main(klass="group span_10_of_12")
 						html_content = parseOnScreenEle(dict_obj, main_tag_in_body)
 						continue
+
 			# print "\n html_content: "
 			# if (html_content):
 			# 	print "Yes"
