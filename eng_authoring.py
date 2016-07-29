@@ -91,8 +91,10 @@ def getVideoRowHTML(vfn, DOM_obj):
             "data-setup":'{}'
         }
         vid_ele = article_ele.video(**vid_ele)
+        subtitles_file_name_list = each_video_file.split('.')[:-1]
+        subtitles_file_name = '.'.join(subtitles_file_name_list)
         vid_ele.source(src="../Video/"+ each_video_file, type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
-        vid_ele.track(kind="captions", src="../Video/"+each_video_file+"_en.vtt", srclang="en", label="English", type="text/vtt")
+        vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name+"_en.vtt", srclang="en", label="English", type="text/vtt")
 
 def getImgRowHTML(fn, DOM_obj):
 
