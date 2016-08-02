@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Please find updated script here: https://github.com/katkamrachana/clix
 Accept file name as arg
@@ -12,9 +13,12 @@ from html import HTML
 # media_mgmt_file = raw_input('Enter Media Mgmt file path (.xlsx file): ')
 # activities_template_workbook = xlrd.open_workbook(activities_template_file)
 # media_mgmt_workbook = xlrd.open_workbook(activities_template_file)
-activities_template_workbook = xlrd.open_workbook('../U1L01 Final Template.xlsx')
+activities_template_workbook = xlrd.open_workbook('../U1L01 Final Template.xlsx', encoding_override="cp1252")
 
 media_mgmt_workbook = xlrd.open_workbook('../English_MAM_U01L01.xlsx')
+# Since MAM file has ONLY 1 sheet
+media_file_sheet = media_mgmt_workbook.sheet_by_index(0)			
+
 print "\n Total Template sheets: ", activities_template_workbook.nsheets
 print "\n Total Media sheets: ", media_mgmt_workbook.nsheets
 if media_mgmt_workbook.nsheets == 0:
@@ -93,7 +97,7 @@ def createHTMLHeaderElement(activity_num, activity_name, body_DOM):
 	header1.hr
 	return body_DOM
 
-def getVideoRowHTML(vfn, DOM_obj):
+def getVideoRowHTML(vfn, DOM_obj, full_dict_obj):
     for each_video_file in vfn:
 
         article_ele = DOM_obj.article(klass='group')
@@ -104,45 +108,45 @@ def getVideoRowHTML(vfn, DOM_obj):
             "data-setup":'{}'
         }
         vid_ele = article_ele.video(**vid_ele)
-        subtitles_file_name_list = each_video_file.split('.')[:-1]
-        subtitles_file_name = '.'.join(subtitles_file_name_list)
-        vid_ele.source(src="../Video/"+ each_video_file, type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
-        vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name+"_en.vtt", srclang="en", label="English", type="text/vtt")
+        subtitles_file_name = (full_dict_obj['Subtitles (Video)']).strip()
+        vid_ele.source(src="../Video/"+ each_video_file, type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'")
+        # vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name+"_en.vtt", srclang="en", label="English", type="text/vtt")
+        vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name, srclang="en", label="English", type="text/vtt")
 
 def getImgRowHTML(fn, DOM_obj):
 
 	'''
-	SINGLE PHOTO
-		<!-- begin 1up photo -->
-		<h2>Heading 2 with a 1up photo.</h2>
+		SINGLE PHOTO
+			<!-- begin 1up photo -->
+			<h2>Heading 2 with a 1up photo.</h2>
 
-		<article class="group">
-			<img src="../Images/tmp_lg_0013.jpg" alt="" class="photo-01up zoom-but-lg" onclick="zoom01.showModal()"/>
-		</article>
-		<!-- end 1up photo -->
+			<article class="group">
+				<img src="../Images/tmp_lg_0013.jpg" alt="" class="photo-01up zoom-but-lg" onclick="zoom01.showModal()"/>
+			</article>
+			<!-- end 1up photo -->
 
-	2 PHOTOS IN A ROW
-		<!-- begin 2up photo -->
-		<h2>Heading 2. And 2 photos in a row.</h2>
+		2 PHOTOS IN A ROW
+			<!-- begin 2up photo -->
+			<h2>Heading 2. And 2 photos in a row.</h2>
 
-		<article class="group">
-			<img src="../Images/tmp_md_0001.jpg" alt="" class="photo-02up row span_6_of_12 zoom-but-md" onclick="zoom01.showModal()"/>
-			<img src="../Images/tmp_md_0002.jpg" alt="" class="photo-02up row span_6_of_12 zoom-but-md" onclick="zoom01.showModal()"/>
-		</article>
+			<article class="group">
+				<img src="../Images/tmp_md_0001.jpg" alt="" class="photo-02up row span_6_of_12 zoom-but-md" onclick="zoom01.showModal()"/>
+				<img src="../Images/tmp_md_0002.jpg" alt="" class="photo-02up row span_6_of_12 zoom-but-md" onclick="zoom01.showModal()"/>
+			</article>
 
-		<!-- end 2up photo -->	
+			<!-- end 2up photo -->	
 
-	3 PHOTOS IN A ROW
+		3 PHOTOS IN A ROW
 
-		<!-- begin 3up photo -->
-		<h2>Heading 2. And 3 photos in a row.</h2>
-		<article class="group">
-			<img src="../Images/tmp_sm_0003.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
-			<img src="../Images/tmp_sm_0004.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
-			<img src="../Images/tmp_sm_0005.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
-		</article>
+			<!-- begin 3up photo -->
+			<h2>Heading 2. And 3 photos in a row.</h2>
+			<article class="group">
+				<img src="../Images/tmp_sm_0003.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
+				<img src="../Images/tmp_sm_0004.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
+				<img src="../Images/tmp_sm_0005.jpg" alt="" class="photo-03up row span_4_of_12 zoom-but-sm" onclick="zoom01.showModal()"/>
+			</article>
 
-		<!-- end 3up photo -->
+			<!-- end 3up photo -->
 
 	'''
 	article_start = True
@@ -177,64 +181,23 @@ def getImgRowHTML(fn, DOM_obj):
 			article_ele.img(src="../Images/"+each_img, alt="", \
 				 klass=class_def, onclick="zoom01.showModal()")
 
-	
-	# ===========================================================				
-	
-	# for i in xrange(len(fn)):
-	# 	print i,
-	# 	if article_start:
-	# 		article_ele = DOM_obj.article(klass='group')
-	# 		article_start = False
-	# 		# print "\n article start", article_ele
-	# 	if len(fn) > 4:
-	# 		mod_div = 3
-	# 	if i%mod_div == 0:
-	# 		print "\n  article_start", i
-	# 		article_start = True
-	# 		# print "\n article end"
-
-	# 	article_ele.img(src="../Images/"+fn[i], alt="", \
-	# 		 klass="photo-02up row span_6_of_12 zoom-but-md", onclick="zoom01.showModal()")
-
-
-	# print "\n  DOM_obj :   ", str(DOM_obj)
-	# return DOM_obj
-
 
 def parseOnScreenEle(dictionary_obj, body_DOM):
 	for ele_type, ele_val in dictionary_obj.items():
 		each_sheet_on_screen_data_keys = ['Image', 'Video', 'Text', 'Word cloud', 'Audio Track', 'Subtitles (Audio)', 'Subtitles (Video)']
 		# print ele_type, " === " ,ele_val
-		if ele_type.strip() == "Text" and ele_val != u'NONE':
+		if ele_type.strip() == "Text" and ele_val != 'NONE':
 			new_val = ele_val.replace('\n', '<br />')
 			section_ele = body_DOM.section
 			section_ele.p(new_val,escape=False)
-		if ele_type.strip() == "Image" and ele_val != u'NONE':
-			print "\n ele_val", ele_val
-			print "\n Imagefound "
-			print ele_val
+		if ele_type.strip() == "Image" and ele_val != 'NONE':
 			img_files = []
 			img_files = ele_val.split(',')
-			print img_files
-			# sheet_imgs_path = 'images/' + each_sheet.name
-			# if os.path.exists(sheet_imgs_path):
-			# 	filelist = os.listdir(sheet_imgs_path)
-			# 	img_files = []
-			# 	for eachfile in filelist:
-			# 		try:
-			# 			valid_img = mimetypes.guess_type(sheet_imgs_path + '/' +eachfile)
-			# 		except Exception as valid_img_err:
-			# 			valid_img = None
-			# 		if valid_img and 'image' in valid_img[0]:
-			# 			img_files.append(eachfile)
-			# 	# print "\n final list: ", img_files
 			if img_files:
 				getImgRowHTML(img_files, body_DOM)
-
-
 			# 	# print "\n\n img_files", img_files
 
-		if ele_type.strip() == "Video" and ele_val != u'NONE':
+		if ele_type.strip() == "Video" and ele_val != 'NONE':
 			'''
 				<video id="[filename without .mp4 here]" class="video-js vis-skin-colors-clix\
 				vjs-big-play-centered" controls="controls" preload="auto" width="480" height="360" data-setup='{}'>
@@ -254,28 +217,14 @@ def parseOnScreenEle(dictionary_obj, body_DOM):
 			'''
 			vid_files = []
 			vid_files = ele_val.split(',')
-			print vid_files
-
-
-			# sheet_videos_path = 'videos/' + each_sheet.name
-			# if os.path.exists(sheet_videos_path):
-			# 	video_filelist = os.listdir(sheet_videos_path)
-			# 	vid_files = []
-			# 	for each_video in video_filelist:
-			# 		try:
-			# 			valid_video = mimetypes.guess_type(sheet_videos_path + '/' +each_video)
-			# 		except Exception as valid_video_err:
-			# 			valid_video = None
-			# 			# print valid_video_err
-			# 		if valid_video and valid_video[0] and 'video' in valid_video[0]:
-			# 			vid_files.append(each_video)
 			if vid_files:
-				getVideoRowHTML(vid_files, body_DOM)
+				getVideoRowHTML(vid_files, body_DOM, dictionary_obj)
+			# print vid_files
 		'''
-		if ele_type.strip() == "Word cloud" and ele_val != u'NONE':
+		if ele_type.strip() == "Word cloud" and ele_val != 'NONE':
 			pass
 		'''
-		if ele_type.strip() == "Audio Track" and ele_val != u'NONE':
+		if ele_type.strip() == "Audio Track" and ele_val != 'NONE':
 			'''
 			<audio width="360" height="360" controls="" class="span_12_of_12">
 				<source src="../Audio/" type="audio/mpeg"/>
@@ -290,10 +239,16 @@ def parseOnScreenEle(dictionary_obj, body_DOM):
 			audio_ele = body_DOM.audio(**audio_ele_data)
 			audio_ele.source(src='../Audio/' + ele_val, type='audio/mpeg')
 
-		if ele_type.strip() == "Subtitles (Audio)" and ele_val != u'NONE':
+
+		if ele_type.strip() == "Subtitles (Audio)" and ele_val != 'NONE':
 			pass
-		if ele_type.strip() == "Subtitles (Video)" and ele_val != u'NONE':
+
+		'''
+		Handled in Video tag generation function getVideoRowHTML.
+
+		if ele_type.strip() == "Subtitles (Video)" and ele_val != 'NONE':
 			pass
+		'''
 	# print "\n body_DOM == ", body_DOM
 	return body_DOM
 try:
@@ -326,6 +281,7 @@ try:
 			# if "On Screen / UnPlatform " in val_list:
 			if unplatform_row_exists:
 				dict_obj = fill_dict(each_sheet, each_row)
+				dict_obj = {k.encode('utf8'): v.encode('utf8') for k, v in dict_obj.items()}
 				# print "\n final dict = ", dict_obj
 				if dict_obj:
 					if activity_num and activity_name:
@@ -334,13 +290,6 @@ try:
 					html_content = parseOnScreenEle(dict_obj, main_tag_in_body)
 					continue
 
-		# print "\n html_content: "
-		# if (html_content):
-		# 	print "Yes"
-		# else:
-		# 	print "No"
-		# print "\n h1_ele: ", html_content
-		# print "\n h2_ele: ", header_ele
 		if body_html:
 			w = open(str(each_sheet.name)+'.html', 'w+')
 			w.write(doc_defination + str(init_html())+str(head_block())+str(body_html)+"</html>")
