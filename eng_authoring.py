@@ -93,7 +93,8 @@ def createHTMLHeaderElement(activity_num, activity_name, body_DOM):
 
 	header1 = body_DOM.header(klass="group span_10_of_12")
 	header1.small("CONVERSATIONAL ENGLISH")
-	header1.h1('Activity ' + activity_num + ' - ' +activity_name)
+	# header1.h1('Activity ' + activity_num + ' - ' +activity_name)
+	header1.h1(activity_name)
 	header1.hr
 	return body_DOM
 
