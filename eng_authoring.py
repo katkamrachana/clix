@@ -69,7 +69,7 @@ def fill_dict(sheet_obj, row_index):
 	# print "\n fval_list",fval_list
 	each_sheet_on_screen_data = {}
 	try:
-		each_sheet_on_screen_data = dict((k, v) for k, v in zip(key_list, fval_list) if v and v != u'None' and unicode(k).strip() in each_sheet_on_screen_data_keys)
+		each_sheet_on_screen_data = dict((k.strip(), v.strip()) for k, v in zip(key_list, fval_list) if v and v != u'None' and unicode(k).strip() in each_sheet_on_screen_data_keys)
 	except UnicodeEncodeError as e:
 		pass
 	except Exception as fill_dict_err:
@@ -108,7 +108,9 @@ def getVideoRowHTML(vfn, DOM_obj, full_dict_obj):
             "data-setup":'{}'
         }
         vid_ele = article_ele.video(**vid_ele)
-        subtitles_file_name = (full_dict_obj['Subtitles (Video)']).strip()
+
+        # print full_dict_obj
+        subtitles_file_name = (full_dict_obj['Subtitles (Video)'])
         vid_ele.source(src="../Video/"+ each_video_file, type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'")
         # vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name+"_en.vtt", srclang="en", label="English", type="text/vtt")
         vid_ele.track(kind="captions", src="../Video/"+subtitles_file_name, srclang="en", label="English", type="text/vtt")
