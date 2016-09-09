@@ -8,6 +8,7 @@ import xlrd
 import  mimetypes
 import os
 from html import HTML
+from basic_setup import *
 # import eng_master_doc
 # activities_template_file = raw_input('Enter Template path(.xlsx file): ')
 # media_mgmt_file = raw_input('Enter Media Mgmt file path (.xlsx file): ')
@@ -24,42 +25,9 @@ print "\n Total Media sheets: ", media_mgmt_workbook.nsheets
 if media_mgmt_workbook.nsheets == 0:
 	print "\n More than 1 sheet found in Media Mgmt file.\n\n" 
 	"Stopping execution."
-doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html>'
+doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
 
 
-def init_html():
-	'''
-	<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-	'''
-
-	html_ele = HTML()
-	html_ele_dct = {
-	       "xmlns" : "http://www.w3.org/1999/xhtml",
-	       "xmlns:epub" : "http://www.idpf.org/2007/ops"
-	}
-	html_ele.html(**html_ele_dct)	
-	return html_ele
-
-def head_block():
-	'''
-	<head>
-		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
-		<title>CLIx</title>
-		<link href="../Styles/style.css" rel="stylesheet" type="text/css" />
-	</head>
-	'''
-	hd = HTML('head')
-	head_ele_dct = {
-	       'http-equiv': 'X-UA-Compatible',
-	       'content': 'IE=edge'
-	}
-	hd.meta(**head_ele_dct)	
-	hd.title('CLIx')
-	hd.link(href="../Styles/style.css", rel="stylesheet", type="text/css")
-	# print hd
-	# head_block = '<head><meta content="IE=edge" http-equiv="X-UA-Compatible" /><title>CLIx</title><link href="../Styles/style.css" rel="stylesheet" type="text/css" /></head>'
-	# return head_block
-	return hd
 
 def fill_dict(sheet_obj, row_index):
 	each_sheet_on_screen_data_keys = ['Image', 'Video', 'Text', 'Word cloud', 'Audio Track', 'Subtitles (Audio)', 'Subtitles (Video)']
