@@ -24,7 +24,7 @@ print "\n Total Media sheets: ", media_mgmt_workbook.nsheets
 if media_mgmt_workbook.nsheets == 0:
 	print "\n More than 1 sheet found in Media Mgmt file.\n\n" 
 	"Stopping execution."
-doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+doc_defination = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html>'
 
 
 def init_html():
