@@ -26,7 +26,18 @@ def head_block():
 	}
 	hd.meta(**head_ele_dct)	
 	hd.title('CLIx')
-	hd.link(href="../Styles/style.css", rel="stylesheet", type="text/css")
+	css_files_path = raw_input("Enter path of folder containing CSS files.\n " + \
+		"Don't worry, ONLY CSS type files will be picked up after your confirmation:\t")
+	all_css_files = os.listdir(css_files_path)
+	print "\n1. Add file: Enter y/Y"
+	print "2. I will add later: Enter any key"
+	for each_css_file in all_css_files:
+		if each_css_file.endswith('.css'):
+			confirmation_css = (raw_input("Do you want to add file: ", each_css_file)).strip()
+			if confirmation_css == 'y' or confirmation_css == 'Y':
+				hd.link(href="../Styles/"+ each_css_file, rel="stylesheet", type="text/css")
+				
+	# hd.link(href="../Styles/style.css", rel="stylesheet", type="text/css")
 	# print hd
 	# head_block = '<head><meta content="IE=edge" http-equiv="X-UA-Compatible" /><title>CLIx</title><link href="../Styles/style.css" rel="stylesheet" type="text/css" /></head>'
 	# return head_block
